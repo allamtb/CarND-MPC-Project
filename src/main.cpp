@@ -91,6 +91,8 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+          double delta= j[1]["steering_angle"];
+          double a = j[1]["throttle"];
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -98,8 +100,51 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
+
+          auto car_ptsx = Eigen::VectorXd(ptsx.size());
+          auto car_ptsy = Eigen::VectorXd(ptsx.size());
+          for (unsigned int i = 0; i < ptsx.size(); i++ ) {
+            double dX = ptsx[i] - px;
+            double dY = ptsy[i] - py;
+            car_ptsx(i) = dX * cos( - psi ) - dY * sin( - psi );
+            car_ptsy(i) = dX * sin( - psi ) + dY * cos( - psi );
+          }
+
+          // Fit 3rd order polynomial of the road
+          auto coeffs = polyfit(car_ptsx, car_ptsy, 3);
+
+          double cte = polyeval(coeffs, 0);
+          double epsi = -atan(coeffs[1]);
+          cout << "cte " << cte <<" epsi " << epsi << endl;
+
+          // current state vector
+          // Initial state.
+          const double x0 = 0;
+          const double y0 = 0;
+          const double psi0 = 0;
+          const double cte0 = coeffs[0];
+          const double epsi0 = -atan(coeffs[1]);
+
+          // Actuator delay in seconds.
+          const double delay = 0.1;
+          const double Lf = 2.67;
+          // State after delay (model applied)
+          double x_delay = x0 + ( v * cos(psi0) * delay );
+          double y_delay = y0 + ( v * sin(psi0) * delay );
+          double psi_delay = psi0 - ( v * delta * delay / Lf );
+          double v_delay = v + a * delay;
+          double cte_delay = cte0 + ( v * sin(epsi0) * delay );
+          double epsi_delay = epsi0 - ( v * atan(coeffs[1]) * delay / Lf );
+
+          Eigen::VectorXd state(6);
+          state << x_delay, y_delay, psi_delay, v_delay, cte_delay, epsi_delay;
+
+          // Find the MPC solution.
+          auto vars = mpc.Solve(state, coeffs);
+
+         double steer_value = -vars[0]/deg2rad(25);
+         double throttle_value = vars[1];
+          std::cout << "steer_value" << steer_value   << "throttle_value"  << throttle_value<< std::endl;
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.

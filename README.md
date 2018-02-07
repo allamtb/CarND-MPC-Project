@@ -3,6 +3,65 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+
+**Model Predictive Control (MPC)** *Rubic Points*
+
+ - **The Model**
+       I have used Kinematic Model as described in the lectures. State of vehicle is defined by vehicle's X, Y position, orientation angle, cross track error and orientation error.  Actuators were also used to extend the model, which included normalized steering angle and acceleration or breaking. Following equations were used to calculate current state of vehicle based on following equations:
+
+    ```
+    x[t] = x[t-1] + v[t-1] * cos(psi[t-1]) * dt
+    
+    y[t] = y[t-1] + v[t-1] * sin(psi[t-1]) * dt
+    
+    psi[t] = psi[t-1] + v[t-1] / Lf * delta[t-1] * dt
+    
+    v[t] = v[t-1] + a[t-1] * dt
+    
+    cte[t] = f(x[t-1]) - y[t-1] + v[t-1] * sin(epsi[t-1]) * dt
+    
+    epsi[t] = psi[t] - psides[t-1] + v[t-1] * delta[t-1] / Lf * dt
+    ```
+
+ - N and dt were selected to be 10 and 0.1 respectively. This was based on the inputs suggested during the lectures. As described that its good to predict CARs trajectory for 1 sec. Slight change in N and dt resulted in very random behavior.
+
+   ```
+   size_t N = 10;
+   double dt = 0.1;
+   ```
+ - The Waypoints provided by the simulator through Websocket were transformed into Car co-ordinates using a 3rd degre polynomial. 
+ 
+   ![coordinary](coordinary.jpg)
+   
+   ```c++
+      auto coeffs = polyfit(car_ptsx, car_ptsy, 3);
+   ```
+
+ -  define a delay factor to  model the delay . here I choose 0.1 because of the project has 100ms dealy.  
+   ```c++
+       const double delay = 0.1;
+       const double Lf = 2.67;
+       // State after delay (model applied)
+        double x_delay = x0 + ( v * cos(psi0) * delay );
+       double y_delay = y0 + ( v * sin(psi0) * delay );
+        double psi_delay = psi0 - ( v * delta * delay / Lf );
+        double v_delay = v + a * delay;
+        double cte_delay = cte0 + ( v * sin(epsi0) * delay );
+       double epsi_delay = epsi0 - ( v * atan(coeffs[1]) * delay / Lf );
+       
+   ```
+
+## The result 
+
+   I don't know why the cost compute by the ipopt is always 0 .
+   **Can you tell me the why?**
+   ```
+   Cost 0
+   42["steer",{"mpc_x":[],"mpc_y":[],"next_x":[],"next_y":[],"steering_angle":-0.0,"throttle":0.0}]
+   ```
+---
+
+
 ## Dependencies
 
 * cmake >= 3.5
