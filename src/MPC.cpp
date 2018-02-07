@@ -14,8 +14,8 @@ int cost_epsi_mul = 100;
 int cost_v_mul = 1;
 int cost_current_delta_mul = 50;
 int cost_current_a_mul = 50;
-int cost_diff_delta_mul = 20000;
-int cost_diff_a_mul = 5000;
+int cost_diff_delta_mul = 2000;
+int cost_diff_a_mul = 500;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -29,7 +29,7 @@ int cost_diff_a_mul = 5000;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
-double ref_v = 50;
+double ref_v = 60;
 
 size_t x_start = 0;
 size_t y_start = x_start + N;
