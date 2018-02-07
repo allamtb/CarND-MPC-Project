@@ -37,7 +37,8 @@ Self-Driving Car Engineer Nanodegree Program
       auto coeffs = polyfit(car_ptsx, car_ptsy, 3);
    ```
 
- -  define a delay factor to  model the delay . here I choose 0.1 because of the project has 100ms dealy.  
+ -  define a delay factor to  model the delay . here I choose 0.1 because of the project has 100ms dealy. 
+     Adapted from https://github.com/ranamanish/CarND-MPC-Project/blob/master/src/main.cpp. 
    ```c++
        const double delay = 0.1;
        const double Lf = 2.67;
@@ -55,6 +56,7 @@ Self-Driving Car Engineer Nanodegree Program
 
    I don't know why the cost compute by the ipopt is always 0 .
    **Can you tell me the why?**
+   
    ```
    Cost 0
    42["steer",{"mpc_x":[],"mpc_y":[],"next_x":[],"next_y":[],"steering_angle":-0.0,"throttle":0.0}]
