@@ -53,7 +53,7 @@ public:
       // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
       // NOTE: You'll probably go back and forth between this function and
       // the Solver function below
-      fg[0] = 1;
+      fg[0] = 0;
 
       // Reference State Cost
       // TODO: Define the cost related the reference state and
